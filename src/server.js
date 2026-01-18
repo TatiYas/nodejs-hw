@@ -1,27 +1,17 @@
 
-// src/server.js
-
-import express from 'express';
-import 'dotenv/config';
+import express from "express";
+import "dotenv/config";
 import cors from 'cors';
 import { connectMongoDB } from './db/connectMongoDB.js';
-import notesRouters from './routes/notesRoutes.js';
-
-const app = express();
-const PORT = process.env.PORT ?? 3030;
-
-//Middleware та маршрути
+// Middlewares
 import { logger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
+// Routers
+import notesRouters from './routes/notesRoutes.js';
 
-// Підключення до MongoDB
-await connectMongoDB();
-
-// запуск сервера
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+const app = express();
+const PORT = process.env.PORT ?? 3000;
 
 app.use(logger);
 app.use(express.json());
@@ -30,11 +20,11 @@ app.use(cors());
 // Notes routers
 app.use(notesRouters);
 
-// Middleware Errors
-app.use(errorHandler);
-
 // Middleware 404
 app.use(notFoundHandler);
+
+// Middleware Errors.
+app.use(errorHandler);
 
 // Connect Mongo
 await connectMongoDB();

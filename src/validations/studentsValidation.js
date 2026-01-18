@@ -1,6 +1,38 @@
 // src/validations/studentsValidation.js
 
-import { Joi, Segments } from "celebrate";
+
+
+import { Joi, Segments } from 'celebrate';
+import { isValidObjectId } from 'mongoose';
+
+// Кастомний валідатор для ObjectId
+const objectIdValidator = (value, helpers) => {
+  return !isValidObjectId(value) ? helpers.message('Invalid id format') : value;
+};
+
+// Схема для перевірки параметра studentId
+export const studentIdParamSchema = {
+  [Segments.PARAMS]: Joi.object({
+    studentId: Joi.string().custom(objectIdValidator).required(),
+  }),
+};
+
+// src/routes/studentsRoutes.js
+
+import { Router } from 'express';
+import { celebrate } from 'celebrate';
+
+import { getStudentById, deleteStudent } from '../controllers/studentsController.js';
+
+
+const router = Router();
+
+router.get('/students/:studentId', celebrate(studentIdParamSchema), getStudentById);
+router.delete('/students/:studentId', celebrate(studentIdParamSchema), deleteStudent);
+
+export default router;
+
+/*import { Joi, Segments } from "celebrate";
 
 export const createStudentSchema = {
   [Segments.BODY]: Joi.object({
@@ -10,5 +42,5 @@ export const createStudentSchema = {
     avgMark: Joi.number().min(2).max(12).required(),
     onDuty: Joi.boolean(),
   }),
-};
+};*/
 

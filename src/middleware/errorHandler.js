@@ -1,14 +1,34 @@
-import { HttpError } from "http-errors";
+// src/server.js
 
-export const errorHandler = (err, req, res, next) => {
+import express from "express";
+import "dotenv/config";
+import cors from "cors";
+// Імпортуємо middleware
+import { errors } from "celebrate";
+import { connectMongoDB } from "./db/connectMongoDB.js";
+import { logger } from "./middleware/logger.js";
+import { notFoundHandler } from "./middleware/notFoundHandler.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import studentsRoutes from "./routes/studentsRoutes.js";
 
-  if (err instanceof HttpError) {
-    return res.status(err.status).json({ message: err.message });
-  }
+const app = express();
+const PORT = process.env.PORT ?? 3000;
 
+app.use(logger);
+app.use(express.json());
+app.use(cors());
 
-  const status = err.status || 500;
-  const message = err.message || "Internal Server Error";
+app.use(studentsRoutes);
 
-  res.status(status).json({ message });
-};
+// обробка 404
+app.use(notFoundHandler);
+// обробка помилок від celebrate (валідація)
+app.use(errors());
+// глобальна обробка інших помилок
+app.use(errorHandler);
+
+await connectMongoDB();
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

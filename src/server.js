@@ -1,6 +1,52 @@
+
+// src/server.js
+
+import express from 'express';
+import 'dotenv/config';
+import cors from 'cors';
+import { connectMongoDB } from './db/connectMongoDB.js';
+import notesRouters from './routes/notesRoutes.js';
+
+const app = express();
+const PORT = process.env.PORT ?? 3030;
+
+//Middleware та маршрути
+import { logger } from './middleware/logger.js';
+import { notFoundHandler } from './middleware/notFoundHandler.js';
+import { errorHandler } from './middleware/errorHandler.js';
+
+// Підключення до MongoDB
+await connectMongoDB();
+
+// запуск сервера
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+app.use(logger);
+app.use(express.json());
+app.use(cors());
+
+// Notes routers
+app.use(notesRouters);
+
+// Middleware Errors
+app.use(errorHandler);
+
+// Middleware 404
+app.use(notFoundHandler);
+
+// Connect Mongo
+await connectMongoDB();
+
+// Launch Server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
 /*const message = 'Hello word';
 console.log(message);*/
-import express from "express";
+/*import express from "express";
 import "dotenv/config";
 import cors from 'cors';
 import pino from 'pino-http';
@@ -55,4 +101,4 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-});
+});*/

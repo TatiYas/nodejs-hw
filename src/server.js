@@ -1,7 +1,8 @@
 
-import express from "express";
-import "dotenv/config";
+import express from 'express';
+import 'dotenv/config';
 import cors from 'cors';
+import { errors } from 'celebrate';
 import { connectMongoDB } from './db/connectMongoDB.js';
 // Middlewares
 import { logger } from './middleware/logger.js';
@@ -13,6 +14,7 @@ import notesRouters from './routes/notesRoutes.js';
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
+
 app.use(logger);
 app.use(express.json());
 app.use(cors());
@@ -22,6 +24,9 @@ app.use(notesRouters);
 
 // Middleware 404
 app.use(notFoundHandler);
+
+// Celebrate errors.
+app.use(errors());
 
 // Middleware Errors.
 app.use(errorHandler);

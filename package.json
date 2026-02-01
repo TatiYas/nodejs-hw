@@ -2767,5 +2767,8 @@
         "url": "https://github.com/sponsors/sindresorhus"
       }
     }
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0"
   }
 }

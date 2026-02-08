@@ -1,50 +1,46 @@
 
+import 'dotenv/config';
 import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { errors } from 'celebrate';
+
 import { connectMongoDB } from './db/connectMongoDB.js';
-// Middlewares
 import { logger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
-// Routers
-import notesRouters from './routes/notesRoutes.js';
+import notesRoutes from './routes/notesRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import { errors } from 'celebrate';
 
 const app = express();
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT || 3000;
 
-
+// Middleware
+//pino-http для логування HTTP-запитів
 app.use(logger);
+// Middleware для парсингу JSON
 app.use(express.json());
+// Дозволяє запити з будь-яких джерел
 app.use(cors());
 app.use(cookieParser());
 
-// Auth routers
 app.use(authRoutes);
+app.use(notesRoutes);
+app.use(userRoutes);
 
-// Notes routers
-app.use(notesRouters);
-
-// Middleware 404
 app.use(notFoundHandler);
-
-// Celebrate errors.
 app.use(errors());
-
-// Middleware Errors.
 app.use(errorHandler);
 
-// Connect Mongo
+// підключення до MongoDB
 await connectMongoDB();
 
-// Launch Server
+// Запуск сервера
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
 /*const message = 'Hello word';
 console.log(message);*/
 /*import express from "express";

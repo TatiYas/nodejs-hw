@@ -1,6 +1,53 @@
+
+import express from 'express';
+import 'dotenv/config';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { errors } from 'celebrate';
+import { connectMongoDB } from './db/connectMongoDB.js';
+// Middlewares
+import { logger } from './middleware/logger.js';
+import { notFoundHandler } from './middleware/notFoundHandler.js';
+import { errorHandler } from './middleware/errorHandler.js';
+// Routers
+import notesRouters from './routes/notesRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+
+const app = express();
+const PORT = process.env.PORT ?? 3000;
+
+
+app.use(logger);
+app.use(express.json());
+app.use(cors());
+app.use(cookieParser());
+
+// Auth routers
+app.use(authRoutes);
+
+// Notes routers
+app.use(notesRouters);
+
+// Middleware 404
+app.use(notFoundHandler);
+
+// Celebrate errors.
+app.use(errors());
+
+// Middleware Errors.
+app.use(errorHandler);
+
+// Connect Mongo
+await connectMongoDB();
+
+// Launch Server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
 /*const message = 'Hello word';
 console.log(message);*/
-import express from "express";
+/*import express from "express";
 import "dotenv/config";
 import cors from 'cors';
 import pino from 'pino-http';
@@ -55,4 +102,4 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-});
+});*/
